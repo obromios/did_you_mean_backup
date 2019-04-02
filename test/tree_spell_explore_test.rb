@@ -1,23 +1,19 @@
 require 'test_helper'
 require 'set'
+require 'yaml'
 
 class TreeSpellExploreTest  < Minitest::Test
-  def test_checkers_with_human_typo_exercise
+  def test_checkers_with_many_typos
     n_repeat = 100
-    first_times = [0, 0, 0]
-    total_suggestions = [0, 0, 0]
-    total_failures = [0, 0, 0]
     files = Dir['test/**/*.rb']
-    len = files.length
-    n_repeat.times do
-      word = files[rand len]
-      word_error = TreeSpellHumanTypo.new(word).call
-      suggestions_a = group_suggestions word_error, files
-      check_first_is_right word, suggestions_a, first_times
-      check_no_suggestions suggestions_a, total_suggestions
-      check_for_failure word, suggestions_a, total_failures
-    end
-    print_results first_times, total_suggestions, total_failures, n_repeat
+    many_typos n_repeat, files
+  end
+
+  def test_checkers_with_many_typos_on_spec
+    n_repeat = 100
+    yaml = File.open("test/tree_spell_spec_dir.yml", 'r', &:read)
+    files = YAML.load yaml
+    many_typos n_repeat, files
   end
 
   def test_human_typo
@@ -35,6 +31,22 @@ class TreeSpellExploreTest  < Minitest::Test
   end
 
   private
+
+  def many_typos(n_repeat, files)
+    first_times = [0, 0, 0]
+    total_suggestions = [0, 0, 0]
+    total_failures = [0, 0, 0]
+    len = files.length
+    n_repeat.times do
+      word = files[rand len]
+      word_error = TreeSpellHumanTypo.new(word).call
+      suggestions_a = group_suggestions word_error, files
+      check_first_is_right word, suggestions_a, first_times
+      check_no_suggestions suggestions_a, total_suggestions
+      check_for_failure word, suggestions_a, total_failures
+    end
+    print_results first_times, total_suggestions, total_failures, n_repeat
+  end
 
   def group_suggestions(word_error, files)
     a0 = TreeSpellChecker.new(dictionary: files).correct word_error

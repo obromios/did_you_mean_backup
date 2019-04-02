@@ -43,7 +43,7 @@ class TreeSpellExploreTest  < Minitest::Test
       suggestions_a = group_suggestions word_error, files
       check_first_is_right word, suggestions_a, first_times
       check_no_suggestions suggestions_a, total_suggestions
-      check_for_failure word, suggestions_a, total_failures
+      check_for_failure word, suggestions_a, total_failures, word_error
     end
     print_results first_times, total_suggestions, total_failures, n_repeat
   end
@@ -55,9 +55,10 @@ class TreeSpellExploreTest  < Minitest::Test
     [a0, a1, a2]
   end
 
-  def check_for_failure(word, suggestions_a, total_failures)
+  def check_for_failure(word, suggestions_a, total_failures, word_error = nil)
     suggestions_a.each_with_index.map do |a, i|
       total_failures[i] += 1 unless a.include? word
+puts "word: #{word}, word_error: #{word_error} suggestions: #{a}" if i.zero? && !a.include?(word)
     end
   end
 

@@ -2,7 +2,6 @@ require 'test_helper'
 require 'set'
 
 class TreeSpellCheckerTest  < Minitest::Test
-
   def setup
     @dictionary = 
       %w(
@@ -18,6 +17,26 @@ class TreeSpellCheckerTest  < Minitest::Test
       )
     @test_str = 'spek/modeks/confirns/viken_spec.rb'
     @tsp = TreeSpellChecker.new(dictionary: @dictionary)
+  end
+
+  def test_special_words
+    special_words.each do |word, word_error|
+      tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
+      s = tsp.correct(word_error).first
+      assert_match s, word
+    end
+  end
+
+  def special_words
+    [['test/fixtures/book.rb', 'test/fixture/book.rb'],
+     ['test/fixtures/book.rb', 'test/fixture/book.rb'],
+     ['test/edit_distance/jaro_winkler_test.rb', 'test/edit_distace/jaro_winkler_test.rb'],
+     ['test/edit_distance/jaro_winkler_test.rb', 'teste/dit_distane/jaro_winkler_test.rb'],
+     ['test/fixtures/book.rb', 'test/fixturWes/book.rb'],
+     ['test/test_helper.rb', 'tes!t/test_helper.rb'],
+     ['test/fixtures/book.rb', 'test/hfixtures/book.rb'],
+     ['test/experimental/method_name_checker_test.rb', 'test/experiental/method_name_checker_test.rb']
+  ]
   end
 
   def test_file_in_root

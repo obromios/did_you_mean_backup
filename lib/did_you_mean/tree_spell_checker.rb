@@ -23,8 +23,7 @@ class TreeSpellChecker
   def find_ideas(paths, suffix)
     paths.map do |path|
       names = base_names(path)
-      checker = ::DidYouMean::SpellChecker.new(dictionary: names)
-      ideas = checker.correct(suffix)
+      ideas = check_names names, suffix
       if ideas.empty?
         nil
       elsif names.include? suffix
@@ -32,6 +31,15 @@ class TreeSpellChecker
       else
         ideas.map { |str| path + separator + str }
       end
+    end
+  end
+
+  def check_names(names, suffix)
+    if names.include? suffix
+      suffix
+    else
+      checker = ::DidYouMean::SpellChecker.new(dictionary: names)
+      checker.correct(suffix)
     end
   end
 

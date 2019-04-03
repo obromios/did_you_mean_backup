@@ -19,6 +19,14 @@ class TreeSpellCheckerTest  < Minitest::Test
     @tsp = TreeSpellChecker.new(dictionary: @dictionary)
   end
 
+  def test_corrupt_root
+    word = 'test/verbose_formatter_test.rb'
+    word_error = 'btets/cverbose_formatter_etst.rb suggestions'
+    tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
+    s = tsp.correct(word_error).first
+      assert_match s, word
+  end
+
   def test_special_words
     special_words.each do |word, word_error|
       tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
@@ -28,14 +36,17 @@ class TreeSpellCheckerTest  < Minitest::Test
   end
 
   def special_words
-    [['test/fixtures/book.rb', 'test/fixture/book.rb'],
+    [
+     ['test/fixtures/book.rb', 'test/fixture/book.rb'],
      ['test/fixtures/book.rb', 'test/fixture/book.rb'],
      ['test/edit_distance/jaro_winkler_test.rb', 'test/edit_distace/jaro_winkler_test.rb'],
      ['test/edit_distance/jaro_winkler_test.rb', 'teste/dit_distane/jaro_winkler_test.rb'],
      ['test/fixtures/book.rb', 'test/fixturWes/book.rb'],
      ['test/test_helper.rb', 'tes!t/test_helper.rb'],
      ['test/fixtures/book.rb', 'test/hfixtures/book.rb'],
-     ['test/experimental/method_name_checker_test.rb', 'test/experiental/method_name_checker_test.rb']
+     ['test/experimental/method_name_checker_test.rb', 'test/experiental/method_name_checker_test.rb'],
+     ['test/edit_distance/jaro_winkler_test.rb', 'test/eidt_distance/jaro_winkler_test.@rb'],
+     ['test/spell_checker_test.rb', 'test/spell_checke@r_test.rb']
   ]
   end
 

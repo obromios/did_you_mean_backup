@@ -23,7 +23,7 @@ class TreeSpellChecker
   def find_ideas(paths, suffix)
     paths.map do |path|
       names = base_names(path)
-      ideas = check_names names, suffix
+      ideas = check_element names, suffix
       if ideas.empty?
         nil
       elsif names.include? suffix
@@ -34,13 +34,21 @@ class TreeSpellChecker
     end
   end
 
-  def check_names(names, suffix)
-    if names.include? suffix
-      suffix
+  def check_element(names, element)
+    str = normalize element
+    if names.include? str
+      [str]
     else
       checker = ::DidYouMean::SpellChecker.new(dictionary: names)
-      checker.correct(suffix)
+      checker.correct(str)
     end
+  end
+
+  def normalize(suffix)
+    str = suffix.dup
+    str.downcase!
+    return str unless str.include? '@'
+    str.tr!('@', '  ')
   end
 
   def base_names(node)
@@ -57,14 +65,9 @@ class TreeSpellChecker
 
   def plausible_states(input)
     elements = input.split(separator)[0..-2]
-    elements.each_with_index.map do |str, i|
+    elements.each_with_index.map do |element, i|
       next if all_states[i].nil?
-      if all_states[i].include? str
-        [str]
-      else
-        checker = ::DidYouMean::SpellChecker.new(dictionary: all_states[i])
-        checker.correct(str)
-      end
+      check_element all_states[i], element
     end.compact
   end
 

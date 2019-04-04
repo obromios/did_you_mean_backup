@@ -58,7 +58,7 @@ class TreeSpellExploreTest  < Minitest::Test
   def check_for_failure(word, suggestions_a, total_failures, word_error = nil)
     suggestions_a.each_with_index.map do |a, i|
       total_failures[i] += 1 unless a.include? word
-puts "word: #{word}, word_error: #{word_error} suggestions: #{a}" if i.zero? && !a.include?(word)
+puts "word: #{word}, word_error: #{word_error} suggestions: #{a}"
     end
   end
 

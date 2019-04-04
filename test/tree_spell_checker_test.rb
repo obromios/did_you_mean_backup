@@ -27,6 +27,14 @@ class TreeSpellCheckerTest  < Minitest::Test
       assert_match s, word
   end
 
+  def test_rake_dictionary
+    dict = %w(parallel:prepare parallel:create parallel:rake parallel:migrate)
+    word_error = 'parallel:preprare'
+    tsp = TreeSpellChecker.new(dictionary: dict, separator: ':')
+    s = tsp.correct(word_error).first
+    assert_match s, 'parallel:prepare'
+  end
+
   def test_special_words
     special_words.each do |word, word_error|
       tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
@@ -46,7 +54,11 @@ class TreeSpellCheckerTest  < Minitest::Test
      ['test/fixtures/book.rb', 'test/hfixtures/book.rb'],
      ['test/experimental/method_name_checker_test.rb', 'test/experiental/method_name_checker_test.rb'],
      ['test/edit_distance/jaro_winkler_test.rb', 'test/eidt_distance/jaro_winkler_test.@rb'],
-     ['test/spell_checker_test.rb', 'test/spell_checke@r_test.rb']
+     ['test/spell_checker_test.rb', 'test/spell_checke@r_test.rb'],
+     ['test/tree_spell_human_typo_test.rb', 'testt/ree_spell_human_typo_test.rb'],
+     ['test/spell_checking/variable_name_check_test.rb', 'test/spell_checking/vriabl_ename_check_test.rb'],
+     ['test/spell_checking/key_name_check_test.rb', 'tesit/spell_checking/key_name_choeck_test.rb'],
+     ['test/edit_distance/jaro_winkler_test.rb', 'test/edit_distance/jaro_winkler_tuest.rb']
   ]
   end
 

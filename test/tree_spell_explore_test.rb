@@ -3,16 +3,16 @@ require 'set'
 require 'yaml'
 
 class TreeSpellExploreTest  < Minitest::Test
-  def test_checkers_with_many_typos
+  def test_checkers_with_many_typos_on_mini
     n_repeat = 100
-    files = Dir['test/**/*.rb']
+    yaml = File.open('test/tree_spell_mini_dir.yml', 'r', &:read)
+    files = YAML.load yaml
     many_typos n_repeat, files
   end
 
-  def test_checkers_with_many_typos_on_spec
+  def test_checkers_with_many_typos_on_rspec
     n_repeat = 100
-    yaml = File.open("test/tree_spell_spec_dir.yml", 'r', &:read)
-    files = YAML.load yaml
+    files = load_rspec_dir
     many_typos n_repeat, files
   end
 
@@ -30,7 +30,46 @@ class TreeSpellExploreTest  < Minitest::Test
     pp ''
   end
 
+  def test_execution_speed_standard
+    n_repeat = 100
+    start_time = Time.now
+    measure_execution_speed(n_repeat) do |files, error|
+      ::DidYouMean::SpellChecker.new(dictionary: files).correct error
+    end
+    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
+    puts "Standard Execution time (ms): #{time_ms.round(1)}"
+  end
+
+  def test_execution_speed_tree
+    n_repeat = 100
+    start_time = Time.now
+    measure_execution_speed(n_repeat) do |files, error|
+      TreeSpellChecker.new(dictionary: files).correct error
+    end
+    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
+    puts "Standard Execution time (ms): #{time_ms.round(1)}"
+  end
+
   private
+
+  def measure_execution_speed(n_repeat, &block)
+    files = load_rspec_dir
+    len = files.length
+    start_time = Time.now
+    n_repeat.times do
+      word = files[rand len]
+      word_error = TreeSpellHumanTypo.new(word).call
+      block.call(files, word_error)
+    end
+    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
+    puts "Execution time (ms): #{time_ms.round(1)}"
+  end
+
+
+  def load_rspec_dir
+    yaml = File.open('test/tree_spell_rspec_dir.yml', 'r', &:read)
+    YAML.load yaml
+  end
 
   def many_typos(n_repeat, files)
     first_times = [0, 0, 0]
@@ -58,7 +97,6 @@ class TreeSpellExploreTest  < Minitest::Test
   def check_for_failure(word, suggestions_a, total_failures, word_error = nil)
     suggestions_a.each_with_index.map do |a, i|
       total_failures[i] += 1 unless a.include? word
-puts "word: #{word}, word_error: #{word_error} suggestions: #{a}"
     end
   end
 

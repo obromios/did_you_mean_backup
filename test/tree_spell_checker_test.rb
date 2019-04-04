@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'set'
+require 'yaml'
 
 class TreeSpellCheckerTest  < Minitest::Test
   def setup
@@ -22,7 +23,7 @@ class TreeSpellCheckerTest  < Minitest::Test
   def test_corrupt_root
     word = 'test/verbose_formatter_test.rb'
     word_error = 'btets/cverbose_formatter_etst.rb suggestions'
-    tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
+    tsp = TreeSpellChecker.new(dictionary: load_mini_dir)
     s = tsp.correct(word_error).first
       assert_match s, word
   end
@@ -35,15 +36,40 @@ class TreeSpellCheckerTest  < Minitest::Test
     assert_match s, 'parallel:prepare'
   end
 
-  def test_special_words
-    special_words.each do |word, word_error|
-      tsp = TreeSpellChecker.new(dictionary: Dir['test/**/*.rb'])
+  def test_special_words_mini
+    files = load_mini_dir
+    tsp = TreeSpellChecker.new(dictionary: files)
+    special_words_mini.each do |word, word_error|
       s = tsp.correct(word_error).first
       assert_match s, word
     end
   end
 
-  def special_words
+  def load_mini_dir
+    yaml = File.open('test/tree_spell_mini_dir.yml', 'r', &:read)
+    YAML.load yaml
+  end
+
+  def test_special_words_rspec
+    yaml = File.open('test/tree_spell_rspec_dir.yml', 'r', &:read)
+    files = YAML.load yaml
+    tsp = TreeSpellChecker.new(dictionary: files)
+    special_words_rspec.each do |word, word_error|
+      s = tsp.correct(word_error).first
+      assert_match s, word
+    end
+  end
+
+  def special_words_rspec
+    [
+      ['spec/rspec/core/formatters/exception_presenter_spec.rb', 'spec/rspec/core/formatters/eception_presenter_spec.rb'],
+      ['spec/rspec/core/ordering_spec.rb', 'spec/spec/core/odrering_spec.rb'],
+      ['spec/rspec/core/metadata_spec.rb', 'spec/rspec/core/metadata_spe.crb'],
+      ['spec/support/mathn_integration_support.rb', 'spec/support/mathn_itegrtion_support.rb']
+    ]
+  end
+
+  def special_words_mini
     [
      ['test/fixtures/book.rb', 'test/fixture/book.rb'],
      ['test/fixtures/book.rb', 'test/fixture/book.rb'],
@@ -63,7 +89,7 @@ class TreeSpellCheckerTest  < Minitest::Test
   end
 
   def test_file_in_root
-    files = Dir['test/**/*.rb']
+    files = load_mini_dir
     word = 'test/spell_checker_test.rb'
     word_error = 'test/spell_checker_test.r'
     suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
@@ -71,7 +97,7 @@ class TreeSpellCheckerTest  < Minitest::Test
   end
 
   def test_no_plausible_states
-    files = Dir['test/**/*.rb']
+    files = load_mini_dir
     word_error = 'testspell_checker_test.rb'
     suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal [], suggestions

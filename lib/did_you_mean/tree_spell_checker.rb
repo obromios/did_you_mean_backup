@@ -2,11 +2,11 @@
 class TreeSpellChecker
   attr_reader :dictionary, :all_states, :separator
 
-# The dictionary is a list of possible words that can
-# match the mispelt word. The dictionary should be
-# tree structured with a single separator. An example
-# is 'spec/models/goals_spec_rb'. The separator
-# cannot be alphabetical or '@' or '.'
+  # The dictionary is a list of possible words that
+  # match a misspelling. The dictionary should be
+  # tree structured with a single character separator
+  # e.g 'spec/models/goals_spec_rb'. The separator
+  # cannot be alphabetical, '@' or '.'.
   def initialize(dictionary:, separator: '/')
     @dictionary = dictionary
     @separator = separator

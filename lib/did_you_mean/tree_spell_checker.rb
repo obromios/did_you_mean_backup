@@ -35,6 +35,7 @@ class TreeSpellChecker
   end
 
   def check_element(names, element)
+    return names if names.size == 1
     str = normalize element
     if names.include? str
       [str]

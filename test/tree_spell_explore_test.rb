@@ -47,7 +47,7 @@ class TreeSpellExploreTest  < Minitest::Test
       TreeSpellChecker.new(dictionary: files).correct error
     end
     time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
-    puts "Standard Execution time (ms): #{time_ms.round(1)}"
+    puts "Tree Execution time (ms): #{time_ms.round(1)}"
   end
 
   private

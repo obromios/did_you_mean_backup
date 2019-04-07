@@ -2,6 +2,7 @@
 # Assumes typographical errors are Poisson distributed and
 # each error is either a deletion, insertion, or transposition
 module TreeSpell
+  require_relative 'change_word'
   class HumanTypo
     LAMBDA = 0.05 # The typographical error rate of the Poisson distribution
 
@@ -22,21 +23,6 @@ module TreeSpell
         break if i_place >= len
       end
       word
-    end
-
-    def insertion_test(i_place, char)
-      @word = input.dup
-      insertion(i_place, char)
-    end
-
-    def deletion_test(i_place)
-      @word = input.dup
-      deletion(i_place)
-    end
-
-    def transposition_test(i_place, direction)
-      @word = input.dup
-      transposition(i_place, direction)
     end
 
     private
@@ -80,49 +66,15 @@ module TreeSpell
     end
 
     def make_change(action, i_place)
+      cw = ChangeWord.new(word)
       case action
       when :delete
-        deletion(i_place)
+        cw.deletion(i_place)
       when :insert
-        insertion(i_place, rand_char)
+        cw.insertion(i_place, rand_char)
       when :transpose
-        transposition(i_place, toss)
+        cw.transposition(i_place, toss)
       end
-    end
-
-    # insert char after index of i_place
-    def insertion(i_place, char)
-      return char + word if i_place == 0
-      return word + char if i_place == len - 1
-      word.insert(i_place + 1, char)
-    end
-
-    def deletion(i_place)
-      word.slice!(i_place)
-      word
-    end
-
-    # transpose char at i_place with char at i_place + direction
-    # if i_place + direction is out of bounds just swap in other direction
-    def transposition(i_place, direction)
-      w = word.dup
-      return  swap_first_two(w) if i_place + direction < 0
-      return  swap_last_two(w) if i_place + direction >= len
-      swap_two(w, i_place, direction)
-      w
-    end
-
-    def swap_first_two(w)
-      w[1] + w[0] + word[2..-1]
-    end
-
-    def swap_last_two(w)
-      w[0...(len - 2)] + word[len - 1] + word[len - 2]
-    end
-
-    def swap_two(w, i_place, direction)
-      w[i_place] = word[i_place + direction]
-      w[i_place + direction] = word[i_place]
     end
 
     def check_input

@@ -12,7 +12,7 @@ module DidYouMean
       @dictionary = dictionary
       @separator = separator
       @augment = augment
-      @all_states = parse
+      @all_states = parse_dimensions
     end
 
     def correct(input)
@@ -54,7 +54,8 @@ module DidYouMean
 
     def find_leaves(path)
       dictionary.map do |str|
-        str.gsub("#{path}#{separator}", '') if str.include? "#{path}#{separator}"
+        next unless str.include? "#{path}#{separator}"
+        str.gsub("#{path}#{separator}", '')
       end.compact
     end
 
@@ -72,26 +73,34 @@ module DidYouMean
       end.compact
     end
 
-    def parse
-      parts_a = dictionary.map do |a|
-        parts = a.split(separator)
-        parts[0..-2]
+    def parse_dimensions
+      leafless = remove_leaves      
+      elements_a = find_elements leafless
+      elements_a.map do |elements|
+        elements.to_set.to_a
+      end
+    end
+
+    def remove_leaves
+      dictionary.map do |a|
+        elements = a.split(separator)
+        elements[0..-2]
       end.to_set.to_a
-      max_parts = parts_a.map(&:size).max
-      nodes = Array.new(max_parts) { [] }
-      (0...max_parts).each do |i|
-        parts_a.each do |parts|
-          nodes[i] << parts[i] unless parts[i].nil?
+    end
+
+    def find_elements(leafless)
+      max_elements = leafless.map(&:size).max
+      elements_a = Array.new(max_elements) { [] }
+      (0...max_elements).each do |i|
+        leafless.each do |elements|
+          elements_a[i] << elements[i] unless elements[i].nil?
         end
       end
-      nodes.map do |node|
-        node.to_set.to_a
-      end
+      elements_a
     end
   end
 
   class CorrectElement
-
     def initialize
     end
 

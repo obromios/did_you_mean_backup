@@ -164,7 +164,7 @@ class TreeSpellCheckerTest  < Minitest::Test
   end
 
   def test_works_out_state_space
-    suggestions = @tsp.send(:plausible_states, @test_str)
+    suggestions = @tsp.send(:plausible_dimensions, @test_str)
     assert_equal suggestions, [["spec"], ["models", "modals"], ["confirms", "concerns"]]
   end
 

@@ -13,6 +13,14 @@ module TreeSpell
       word.insert(i_place + 1, char)
     end
 
+    # substitute char at index of i_place
+    def substitution(i_place, char)
+      @word = input.dup
+      word[i_place] = char
+      word
+    end
+
+    # delete character at index of i_place
     def deletion(i_place)
       @word = input.dup
       word.slice!(i_place)

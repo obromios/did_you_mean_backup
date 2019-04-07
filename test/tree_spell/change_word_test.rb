@@ -14,6 +14,12 @@ class ChangeWordTest < Minitest::Test
     assert_match @cw.deletion(0), 'pec/services/anything_spec'
   end
 
+  def test_substitution
+    assert_match @cw.substitution(5, '$'), 'spec/$ervices/anything_spec'
+    assert_match @cw.substitution(@len - 1, '$'), 'spec/services/anything_spe$'
+    assert_match @cw.substitution(0, '$'), '$pec/services/anything_spec'
+  end
+
   def test_insertion
     assert_match @cw.insertion(7, 'X'), 'spec/serXvices/anything_spec'
     assert_match @cw.insertion(0, 'X'), 'Xspec/services/anything_spec'

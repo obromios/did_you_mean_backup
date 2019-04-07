@@ -67,7 +67,6 @@ class TreeSpellCheckerTest  < Minitest::Test
     special_words_rspec.each do |word, word_error|
       s = tsp.correct(word_error)
       assert_match s.first, word
-  puts "word: #{word}, size: #{s.size}"
     end
   end
 

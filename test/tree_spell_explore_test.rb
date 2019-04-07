@@ -8,17 +8,17 @@ class TreeSpellExploreTest  < Minitest::Test
     n_repeat = 100
     yaml = File.open('test/tree_spell_mini_dir.yml', 'r', &:read)
     files = YAML.load yaml
-    many_typos n_repeat, files
+    many_typos n_repeat, files, 'Minitest'
   end
 
   def test_checkers_with_many_typos_on_rspec
     n_repeat = 100
     files = load_rspec_dir
-    many_typos n_repeat, files
+    many_typos n_repeat, files, 'Rspec'
   end
 
   def test_human_typo
-    n_repeat = 10000
+    n_repeat = 100
     total_changes = 0
     word = 'any_string_that_is_40_characters_long_sp'
     n_repeat.times do
@@ -26,29 +26,24 @@ class TreeSpellExploreTest  < Minitest::Test
       total_changes += DidYouMean::Levenshtein.distance(word, word_error)
     end
     mean_changes = (total_changes.to_f / n_repeat).round(2)
-    pp ''
+    puts ''
     puts "HumanTypo mean_changes: #{mean_changes} with n_repeat: #{n_repeat}"
-    puts 'Expected  mean_changes: 2.23 with n_repeat: 1000, plus/minus 0.03'
+    puts 'Expected  mean_changes: 2.23 with n_repeat: 10000, plus/minus 0.03'
+    puts ''
   end
 
-  def test_execution_speed_standard
+  def test_execution_speed
     n_repeat = 100
-    start_time = Time.now
-    measure_execution_speed(n_repeat) do |files, error|
-      ::DidYouMean::SpellChecker.new(dictionary: files).correct error
-    end
-    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
-    puts "Standard Execution time (ms): #{time_ms.round(1)}"
-  end
-
-  def test_execution_speed_tree
-    n_repeat = 100
-    start_time = Time.now
+    puts ''
+    puts 'Testing execution time of Tree'
     measure_execution_speed(n_repeat) do |files, error|
       TreeSpellChecker.new(dictionary: files).correct error
     end
-    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
-    puts "Tree Execution time (ms): #{time_ms.round(1)}"
+    puts ''
+    puts 'Testing execution time of Standard'
+    measure_execution_speed(n_repeat) do |files, error|
+      DidYouMean::SpellChecker.new(dictionary: files).correct error
+    end
   end
 
   private
@@ -62,7 +57,8 @@ class TreeSpellExploreTest  < Minitest::Test
       word_error = TreeSpell::HumanTypo.new(word).call
       block.call(files, word_error)
     end
-    (Time.now - start_time).to_f * 1000 / n_repeat
+    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
+    puts "Average time (ms): #{time_ms.round(1)}"
   end
 
 
@@ -71,7 +67,7 @@ class TreeSpellExploreTest  < Minitest::Test
     YAML.load yaml
   end
 
-  def many_typos(n_repeat, files)
+  def many_typos(n_repeat, files, title)
     first_times = [0, 0, 0]
     total_suggestions = [0, 0, 0]
     total_failures = [0, 0, 0]
@@ -84,7 +80,7 @@ class TreeSpellExploreTest  < Minitest::Test
       check_no_suggestions suggestions_a, total_suggestions
       check_for_failure word, suggestions_a, total_failures, word_error
     end
-    print_results first_times, total_suggestions, total_failures, n_repeat
+    print_results first_times, total_suggestions, total_failures, n_repeat, title
   end
 
   def group_suggestions(word_error, files)
@@ -112,21 +108,21 @@ class TreeSpellExploreTest  < Minitest::Test
     end
   end
 
-  def print_results(first_times, total_suggestions, total_failures, n_repeat)
+  def print_results(first_times, total_suggestions, total_failures, n_repeat, title)
     algorithms = ['Tree    ', 'Standard', 'Combined']
-    print_header
+    print_header title
     (0..2).each do |i|
       ft = (first_times[i].to_f / n_repeat * 100).round(1)
       mns = (total_suggestions[i].to_f / (n_repeat - total_failures[i])).round(1)
       f = (total_failures[i].to_f / n_repeat * 100).round(1)
-      pp " #{algorithms[i]}  #{' ' * 7}  #{ft} #{' ' * 14} #{mns} #{' ' * 15} #{f} #{' ' * 16}"
+      puts " #{algorithms[i]}  #{' ' * 7}  #{ft} #{' ' * 14} #{mns} #{' ' * 15} #{f} #{' ' * 16}"
     end
   end
 
-  def print_header
-    pp "#{' ' * 33} Summary #{' ' * 38}"
-    pp '-' * 80
-    pp " Method  |   First Time (\%)    Mean Suggestions       Failures (\%) #{' ' * 13}"
-    pp '-' * 80
+  def print_header(title)
+    puts "#{' ' * 30} #{title} Summary #{' ' * 31}"
+    puts '-' * 80
+    puts " Method  |   First Time (\%)    Mean Suggestions       Failures (\%) #{' ' * 13}"
+    puts '-' * 80
   end
 end

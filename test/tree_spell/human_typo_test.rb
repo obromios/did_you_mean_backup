@@ -9,7 +9,7 @@ class HumanTypoTest < Minitest::Test
   end
 
   def test_changes
-    # choose seed so all four actions are called
+    # srand seed ensures all four actions are called
     srand 247_696_449
     sh = TreeSpell::HumanTypo.new(@input, lambda: 0.20)
     word_error = sh.call

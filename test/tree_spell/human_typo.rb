@@ -62,7 +62,7 @@ module TreeSpell
     end
 
     def action_type
-      [:insert, :transpose, :delete][rand(3)]
+      [:insert, :transpose, :delete, :substitute][rand(3)]
     end
 
     def make_change(action, i_place)
@@ -72,6 +72,8 @@ module TreeSpell
         cw.deletion(i_place)
       when :insert
         cw.insertion(i_place, rand_char)
+      when :substitute
+        cw.substitution(i_place, rand_char)
       when :transpose
         cw.transposition(i_place, toss)
       end

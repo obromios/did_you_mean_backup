@@ -18,17 +18,17 @@ class TreeSpellExploreTest  < Minitest::Test
   end
 
   def test_human_typo
-    n_repeat = 1000
+    n_repeat = 10000
     total_changes = 0
     word = 'any_string_that_is_40_characters_long_sp'
     n_repeat.times do
       word_error = TreeSpell::HumanTypo.new(word).call
       total_changes += DidYouMean::Levenshtein.distance(word, word_error)
     end
-    mean_changes = (total_changes.to_f / n_repeat).round(1)
+    mean_changes = (total_changes.to_f / n_repeat).round(2)
     pp ''
     puts "HumanTypo mean_changes: #{mean_changes} with n_repeat: #{n_repeat}"
-    puts 'Expected  mean_changes: 2.2 with n_repeat: 1000'
+    puts 'Expected  mean_changes: 2.23 with n_repeat: 1000, plus/minus 0.03'
   end
 
   def test_execution_speed_standard
@@ -62,8 +62,7 @@ class TreeSpellExploreTest  < Minitest::Test
       word_error = TreeSpell::HumanTypo.new(word).call
       block.call(files, word_error)
     end
-    time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
-    puts "Execution time (ms): #{time_ms.round(1)}"
+    (Time.now - start_time).to_f * 1000 / n_repeat
   end
 
 

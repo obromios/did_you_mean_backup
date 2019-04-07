@@ -145,9 +145,9 @@ class TreeSpellCheckerTest  < Minitest::Test
     assert_equal suggestions.first, correct_input
   end
 
-  def test_find_out_base_names_in_a_node
-    node = 'spec/modals/confirms'
-    names = @tsp.send(:base_names, node)
+  def test_find_out_leaves_in_a_path
+    path = 'spec/modals/confirms'
+    names = @tsp.send(:find_leaves, path)
     assert_equal names.to_set, %w(abcd_spec.rb efgh_spec.rb).to_set
   end
 

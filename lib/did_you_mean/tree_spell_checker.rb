@@ -19,8 +19,8 @@ class TreeSpellChecker
     return no_idea(input) if states.empty?
     nodes = states[0].product(*states[1..-1])
     paths = possible_paths nodes
-    suffix = input.split(separator).last
-    ideas = find_ideas(paths, suffix)
+    leaf = input.split(separator).last
+    ideas = find_ideas(paths, leaf)
     suggestions = ideas.compact.flatten
     return no_idea(input) if suggestions.empty?
     suggestions
@@ -33,14 +33,14 @@ class TreeSpellChecker
     ::DidYouMean::SpellChecker.new(dictionary: dictionary).correct(input)
   end
 
-  def find_ideas(paths, suffix)
+  def find_ideas(paths, leaf)
     paths.map do |path|
-      names = base_names(path)
-      ideas = check_element names, suffix
+      names = find_leaves(path)
+      ideas = check_element names, leaf
       if ideas.empty?
         nil
-      elsif names.include? suffix
-        [path + separator + suffix]
+      elsif names.include? leaf
+        [path + separator + leaf]
       else
         ideas.map { |str| path + separator + str }
       end
@@ -58,16 +58,16 @@ class TreeSpellChecker
     end
   end
 
-  def normalize(suffix)
-    str = suffix.dup
+  def normalize(leaf)
+    str = leaf.dup
     str.downcase!
     return str unless str.include? '@'
     str.tr!('@', '  ')
   end
 
-  def base_names(node)
+  def find_leaves(path)
     dictionary.map do |str|
-      str.gsub("#{node}#{separator}", '') if str.include? "#{node}#{separator }"
+      str.gsub("#{path}#{separator}", '') if str.include? "#{path}#{separator}"
     end.compact
   end
 
@@ -90,8 +90,8 @@ class TreeSpellChecker
       parts = a.split(separator)
       parts[0..-2]
     end.to_set.to_a
-    max_parts = parts_a.map { |parts| parts.size }.max
-    nodes =Array.new(max_parts){[]}
+    max_parts = parts_a.map(&:size).max
+    nodes = Array.new(max_parts) { [] }
     (0...max_parts).each do |i|
       parts_a.each do |parts|
         nodes[i] << parts[i] unless parts[i].nil?

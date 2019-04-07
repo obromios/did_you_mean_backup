@@ -4,12 +4,11 @@
 module TreeSpell
   require_relative 'change_word'
   class HumanTypo
-    LAMBDA = 0.05 # The typographical error rate of the Poisson distribution
-
-    def initialize(input)
+    def initialize(input, lambda: 0.05)
       @input = input
       check_input
       @len = input.length
+      @lambda = lambda
     end
 
     def call
@@ -27,7 +26,7 @@ module TreeSpell
 
     private
 
-    attr_accessor :input, :word, :len
+    attr_accessor :input, :word, :len, :lambda
 
     def initialize_i_place
       i_place = nil
@@ -38,7 +37,7 @@ module TreeSpell
       i_place
     end
 
-    def exponential(lambda = LAMBDA)
+    def exponential
       (rand / (lambda / 2)).to_i
     end
 
@@ -62,7 +61,7 @@ module TreeSpell
     end
 
     def action_type
-      [:insert, :transpose, :delete, :substitute][rand(3)]
+      [:insert, :transpose, :delete, :substitute][rand(4)]
     end
 
     def make_change(action, i_place)

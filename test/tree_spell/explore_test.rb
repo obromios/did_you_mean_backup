@@ -5,7 +5,7 @@ require_relative 'human_typo'
 
 class ExploreTest  < Minitest::Test
   def test_checkers_with_many_typos_on_mini
-    n_repeat = 100
+    n_repeat = 10000
     yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
     files = YAML.load yaml
     many_typos n_repeat, files, 'Minitest'

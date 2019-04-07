@@ -25,7 +25,17 @@ class TreeSpellCheckerTest  < Minitest::Test
     word_error = 'btets/cverbose_formatter_etst.rb suggestions'
     tsp = TreeSpellChecker.new(dictionary: load_mini_dir)
     s = tsp.correct(word_error).first
-      assert_match s, word
+    assert_match s, word
+  end
+
+  def test_leafless_state
+    tsp = TreeSpellChecker.new(dictionary: @dictionary.push('spec/features'))
+    word = 'spec/modals/confirms/efgh_spec.rb'
+    word_error = 'spec/modals/confirXX/efgh_spec.rb'
+    s = tsp.correct(word_error).first
+    assert_equal s, word
+    s = tsp.correct('spec/featuresXX')
+    assert_equal 'spec/features', s.first
   end
 
   def test_rake_dictionary
@@ -102,6 +112,24 @@ class TreeSpellCheckerTest  < Minitest::Test
     word_error = 'testspell_checker_test.rb'
     suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal [], suggestions
+  end
+
+  def test_no_plausible_states_with_augmentation
+    files = load_mini_dir
+    word_error = 'testspell_checker_test.rb'
+    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    assert_equal [], suggestions
+    suggestions = TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
+    assert_equal 'test/spell_checker_test.rb', suggestions.first
+  end
+
+  def test_no_idea_with_augmentation
+    files = load_mini_dir
+    word_error = 'test/spell_checking/key_name.rb'
+    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    assert_equal [], suggestions
+    suggestions = TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
+    assert_equal 'test/spell_checking/key_name_check_test.rb', suggestions.first
   end
 
   def test_works_out_suggestions

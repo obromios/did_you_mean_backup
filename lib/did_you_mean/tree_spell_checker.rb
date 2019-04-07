@@ -1,29 +1,37 @@
 # spell checker for a dictionary that has a tree structure
 class TreeSpellChecker
-  attr_reader :dictionary, :all_states, :separator
+  attr_reader :dictionary, :all_states, :separator, :augment
 
   # The dictionary is a list of possible words that
   # match a misspelling. The dictionary should be
   # tree structured with a single character separator
   # e.g 'spec/models/goals_spec_rb'. The separator
   # cannot be alphabetical, '@' or '.'.
-  def initialize(dictionary:, separator: '/')
+  def initialize(dictionary:, separator: '/', augment: nil)
     @dictionary = dictionary
     @separator = separator
+    @augment = augment
     @all_states = parse
   end
 
   def correct(input)
     states = plausible_states input
-    return [] if states.empty?
+    return no_idea(input) if states.empty?
     nodes = states[0].product(*states[1..-1])
     paths = possible_paths nodes
     suffix = input.split(separator).last
     ideas = find_ideas(paths, suffix)
-    ideas.compact.flatten
+    suggestions = ideas.compact.flatten
+    return no_idea(input) if suggestions.empty?
+    suggestions
   end
 
   private
+
+  def no_idea(input)
+    return [] unless augment
+    ::DidYouMean::SpellChecker.new(dictionary: dictionary).correct(input)
+  end
 
   def find_ideas(paths, suffix)
     paths.map do |path|

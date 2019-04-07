@@ -1,6 +1,7 @@
 require 'test_helper'
 require 'set'
 require 'yaml'
+require_relative 'tree_spell/human_typo'
 
 class TreeSpellExploreTest  < Minitest::Test
   def test_checkers_with_many_typos_on_mini
@@ -26,8 +27,8 @@ class TreeSpellExploreTest  < Minitest::Test
     end
     mean_changes = (total_changes.to_f / n_repeat).round(1)
     pp ''
-    puts "HumanTypo mean_changes =  #{mean_changes}"
-    pp ''
+    puts "HumanTypo mean_changes: #{mean_changes} with n_repeat: #{n_repeat}"
+    puts 'Expected  mean_changes: 2.2 with n_repeat: 1000'
   end
 
   def test_execution_speed_standard

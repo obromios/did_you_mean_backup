@@ -1,9 +1,10 @@
 require 'test_helper'
+require_relative 'tree_spell/human_typo'
 
-class TreeSpellHumanTypoTest < Minitest::Test
+class TreeSpell::HumanTypoTest < Minitest::Test
   def setup
     @input = 'spec/services/anything_spec'
-    @sh = TreeSpellHumanTypo.new(@input)
+    @sh = TreeSpell::HumanTypo.new(@input)
     @len = @input.length
   end
 
@@ -34,6 +35,6 @@ class TreeSpellHumanTypoTest < Minitest::Test
   end
 
   def test_check_input
-    assert_raises(StandardError) { TreeSpellHumanTypo.new('tiny') }
+    assert_raises(StandardError) { TreeSpell::HumanTypo.new('tiny') }
   end
 end

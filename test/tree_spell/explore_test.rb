@@ -1,18 +1,18 @@
 require 'test_helper'
 require 'set'
 require 'yaml'
-require_relative 'tree_spell/human_typo'
+require_relative 'human_typo'
 
-class TreeSpellExploreTest  < Minitest::Test
+class ExploreTest  < Minitest::Test
   def test_checkers_with_many_typos_on_mini
     n_repeat = 100
-    yaml = File.open('test/tree_spell_mini_dir.yml', 'r', &:read)
+    yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
     files = YAML.load yaml
     many_typos n_repeat, files, 'Minitest'
   end
 
   def test_checkers_with_many_typos_on_rspec
-    n_repeat = 100
+    n_repeat = 10
     files = load_rspec_dir
     many_typos n_repeat, files, 'Rspec'
   end
@@ -33,11 +33,11 @@ class TreeSpellExploreTest  < Minitest::Test
   end
 
   def test_execution_speed
-    n_repeat = 100
+    n_repeat = 10
     puts ''
     puts 'Testing execution time of Tree'
     measure_execution_speed(n_repeat) do |files, error|
-      TreeSpellChecker.new(dictionary: files).correct error
+      DidYouMean::TreeSpellChecker.new(dictionary: files).correct error
     end
     puts ''
     puts 'Testing execution time of Standard'
@@ -63,7 +63,7 @@ class TreeSpellExploreTest  < Minitest::Test
 
 
   def load_rspec_dir
-    yaml = File.open('test/tree_spell_rspec_dir.yml', 'r', &:read)
+    yaml = File.open('test/tree_spell/rspec_dir.yml', 'r', &:read)
     YAML.load yaml
   end
 
@@ -84,7 +84,7 @@ class TreeSpellExploreTest  < Minitest::Test
   end
 
   def group_suggestions(word_error, files)
-    a0 = TreeSpellChecker.new(dictionary: files).correct word_error
+    a0 = DidYouMean::TreeSpellChecker.new(dictionary: files).correct word_error
     a1 = ::DidYouMean::SpellChecker.new(dictionary: files).correct word_error
     a2 =  a0.empty? ? a1 : a0
     [a0, a1, a2]

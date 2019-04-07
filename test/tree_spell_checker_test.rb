@@ -17,19 +17,19 @@ class TreeSpellCheckerTest  < Minitest::Test
         spec/controllers/vixen_controller_spec.rb
       )
     @test_str = 'spek/modeks/confirns/viken_spec.rb'
-    @tsp = TreeSpellChecker.new(dictionary: @dictionary)
+    @tsp = DidYouMean::TreeSpellChecker.new(dictionary: @dictionary)
   end
 
   def test_corrupt_root
     word = 'test/verbose_formatter_test.rb'
     word_error = 'btets/cverbose_formatter_etst.rb suggestions'
-    tsp = TreeSpellChecker.new(dictionary: load_mini_dir)
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: load_mini_dir)
     s = tsp.correct(word_error).first
     assert_match s, word
   end
 
   def test_leafless_state
-    tsp = TreeSpellChecker.new(dictionary: @dictionary.push('spec/features'))
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: @dictionary.push('spec/features'))
     word = 'spec/modals/confirms/efgh_spec.rb'
     word_error = 'spec/modals/confirXX/efgh_spec.rb'
     s = tsp.correct(word_error).first
@@ -41,14 +41,14 @@ class TreeSpellCheckerTest  < Minitest::Test
   def test_rake_dictionary
     dict = %w(parallel:prepare parallel:create parallel:rake parallel:migrate)
     word_error = 'parallel:preprare'
-    tsp = TreeSpellChecker.new(dictionary: dict, separator: ':')
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: dict, separator: ':')
     s = tsp.correct(word_error).first
     assert_match s, 'parallel:prepare'
   end
 
   def test_special_words_mini
     files = load_mini_dir
-    tsp = TreeSpellChecker.new(dictionary: files)
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: files)
     special_words_mini.each do |word, word_error|
       s = tsp.correct(word_error).first
       assert_match s, word
@@ -56,14 +56,14 @@ class TreeSpellCheckerTest  < Minitest::Test
   end
 
   def load_mini_dir
-    yaml = File.open('test/tree_spell_mini_dir.yml', 'r', &:read)
+    yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
     YAML.load yaml
   end
 
   def test_special_words_rspec
-    yaml = File.open('test/tree_spell_rspec_dir.yml', 'r', &:read)
+    yaml = File.open('test/tree_spell/rspec_dir.yml', 'r', &:read)
     files = YAML.load yaml
-    tsp = TreeSpellChecker.new(dictionary: files)
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: files)
     special_words_rspec.each do |word, word_error|
       s = tsp.correct(word_error)
       assert_match s.first, word
@@ -102,32 +102,32 @@ class TreeSpellCheckerTest  < Minitest::Test
     files = load_mini_dir
     word = 'test/spell_checker_test.rb'
     word_error = 'test/spell_checker_test.r'
-    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal word, suggestions.first
   end
 
   def test_no_plausible_states
     files = load_mini_dir
     word_error = 'testspell_checker_test.rb'
-    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal [], suggestions
   end
 
   def test_no_plausible_states_with_augmentation
     files = load_mini_dir
     word_error = 'testspell_checker_test.rb'
-    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal [], suggestions
-    suggestions = TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
     assert_equal 'test/spell_checker_test.rb', suggestions.first
   end
 
   def test_no_idea_with_augmentation
     files = load_mini_dir
     word_error = 'test/spell_checking/key_name.rb'
-    suggestions = TreeSpellChecker.new(dictionary: files).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files).correct word_error
     assert_equal [], suggestions
-    suggestions = TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
+    suggestions = DidYouMean::TreeSpellChecker.new(dictionary: files, augment: true).correct word_error
     assert_equal 'test/spell_checking/key_name_check_test.rb', suggestions.first
   end
 
@@ -175,7 +175,7 @@ class TreeSpellCheckerTest  < Minitest::Test
 
   def test_parses_elementary_dictionary
     dictionary = ['spec/models/user_spec.rb', 'spec/services/account_spec.rb']
-    tsp = TreeSpellChecker.new(dictionary: dictionary)
+    tsp = DidYouMean::TreeSpellChecker.new(dictionary: dictionary)
     states = tsp.send(:parse)
     assert_equal states, [['spec'], ['models', 'services']]
   end

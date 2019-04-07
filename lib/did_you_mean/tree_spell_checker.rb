@@ -18,16 +18,20 @@ module DidYouMean
     def correct(input)
       states = plausible_states input
       return no_idea(input) if states.empty?
-      nodes = states[0].product(*states[1..-1])
-      paths = possible_paths nodes
-      leaf = input.split(separator).last
-      ideas = find_ideas(paths, leaf)
-      suggestions = ideas.compact.flatten
+      suggestions = find_suggestions input, states
       return no_idea(input) if suggestions.empty?
       suggestions
     end
 
     private
+
+    def find_suggestions(input, states)
+      nodes = states[0].product(*states[1..-1])
+      paths = possible_paths nodes
+      leaf = input.split(separator).last
+      ideas = find_ideas(paths, leaf)
+      ideas.compact.flatten
+    end
 
     def no_idea(input)
       return [] unless augment
@@ -37,7 +41,7 @@ module DidYouMean
     def find_ideas(paths, leaf)
       paths.map do |path|
         names = find_leaves(path)
-        ideas = check_element names, leaf
+        ideas = CorrectElement.new.call names, leaf
         if ideas.empty?
           nil
         elsif names.include? leaf
@@ -46,24 +50,6 @@ module DidYouMean
           ideas.map { |str| path + separator + str }
         end
       end
-    end
-
-    def check_element(names, element)
-      return names if names.size == 1
-      str = normalize element
-      if names.include? str
-        [str]
-      else
-        checker = ::DidYouMean::SpellChecker.new(dictionary: names)
-        checker.correct(str)
-      end
-    end
-
-    def normalize(leaf)
-      str = leaf.dup
-      str.downcase!
-      return str unless str.include? '@'
-      str.tr!('@', '  ')
     end
 
     def find_leaves(path)
@@ -82,7 +68,7 @@ module DidYouMean
       elements = input.split(separator)[0..-2]
       elements.each_with_index.map do |element, i|
         next if all_states[i].nil?
-        check_element all_states[i], element
+        CorrectElement.new.call all_states[i], element
       end.compact
     end
 
@@ -101,6 +87,29 @@ module DidYouMean
       nodes.map do |node|
         node.to_set.to_a
       end
+    end
+  end
+
+  class CorrectElement
+
+    def initialize
+    end
+
+    def call(names, element)
+      return names if names.size == 1
+      str = normalize element
+      return [str] if names.include? str
+      checker = ::DidYouMean::SpellChecker.new(dictionary: names)
+      checker.correct(str)
+    end
+
+    private
+
+    def normalize(leaf)
+      str = leaf.dup
+      str.downcase!
+      return str unless str.include? '@'
+      str.tr!('@', '  ')
     end
   end
 end

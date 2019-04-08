@@ -1,5 +1,8 @@
 module TreeSpell
+  # Changes a word with one of four actions:
+  # insertion, substitution, deletion and transposition.
   class ChangeWord
+    # initialize with input string
     def initialize(input)
       @input = input
       @len = input.length

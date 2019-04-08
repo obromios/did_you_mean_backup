@@ -1,13 +1,8 @@
 module DidYouMean
-  # spell checker for a dictionary that has a tree structure
+  # spell checker for a dictionary that has a tree structure, see doc/tree_spell_checker_api.md
   class TreeSpellChecker
     attr_reader :dictionary, :dimensions, :separator, :augment
 
-    # The dictionary is a list of possible words that
-    # match a misspelling. The dictionary should be
-    # tree structured with a single character separator
-    # e.g 'spec/models/goals_spec_rb'. The separator
-    # cannot be alphabetical, '@' or '.'.
     def initialize(dictionary:, separator: '/', augment: nil)
       @dictionary = dictionary
       @separator = separator

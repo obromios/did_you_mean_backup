@@ -1,8 +1,7 @@
-# Simulate a error prone human typist
-# Assumes typographical errors are Poisson distributed and
-# each error is either a deletion, insertion, or transposition
 module TreeSpell
   require_relative 'change_word'
+  # Simulate an error prone human typist
+  # see doc/human_typo_api.md for the api description
   class HumanTypo
     def initialize(input, lambda: 0.05)
       @input = input

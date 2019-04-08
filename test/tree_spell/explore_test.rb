@@ -1,24 +1,30 @@
+EXPLORE = false # set to true to run tests
+  
+return unless EXPLORE
+
 require 'test_helper'
 require 'set'
 require 'yaml'
 require_relative 'human_typo'
 
 class ExploreTest  < Minitest::Test
+
+
   def test_checkers_with_many_typos_on_mini
-    n_repeat = 10
+    n_repeat = 10_000
     yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
     files = YAML.load yaml
     many_typos n_repeat, files, 'Minitest'
   end
 
   def test_checkers_with_many_typos_on_rspec
-    n_repeat = 10
+    n_repeat = 10_000
     files = load_rspec_dir
     many_typos n_repeat, files, 'Rspec'
   end
 
   def test_human_typo
-    n_repeat = 100
+    n_repeat = 10_000
     total_changes = 0
     word = 'any_string_that_is_40_characters_long_sp'
     n_repeat.times do
@@ -28,12 +34,12 @@ class ExploreTest  < Minitest::Test
     mean_changes = (total_changes.to_f / n_repeat).round(2)
     puts ''
     puts "HumanTypo mean_changes: #{mean_changes} with n_repeat: #{n_repeat}"
-    puts 'Expected  mean_changes: 2.23 with n_repeat: 10000, plus/minus 0.03'
+    puts 'Expected  mean_changes: 2.1 with n_repeat: 10000, plus/minus 0.03'
     puts ''
   end
 
   def test_execution_speed
-    n_repeat = 10
+    n_repeat = 100
     puts ''
     puts 'Testing execution time of Tree'
     measure_execution_speed(n_repeat) do |files, error|
@@ -49,7 +55,7 @@ class ExploreTest  < Minitest::Test
   private
 
   def measure_execution_speed(n_repeat, &block)
-    files = load_rspec_dir
+    files = load_mini_dir
     len = files.length
     start_time = Time.now
     n_repeat.times do
@@ -67,6 +73,11 @@ class ExploreTest  < Minitest::Test
     YAML.load yaml
   end
 
+  def load_mini_dir
+    yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
+    YAML.load yaml
+  end
+
   def many_typos(n_repeat, files, title)
     first_times = [0, 0, 0]
     total_suggestions = [0, 0, 0]
@@ -78,7 +89,7 @@ class ExploreTest  < Minitest::Test
       suggestions_a = group_suggestions word_error, files
       check_first_is_right word, suggestions_a, first_times
       check_no_suggestions suggestions_a, total_suggestions
-      check_for_failure word, suggestions_a, total_failures, word_error
+      check_for_failure word, suggestions_a, total_failures
     end
     print_results first_times, total_suggestions, total_failures, n_repeat, title
   end
@@ -90,7 +101,7 @@ class ExploreTest  < Minitest::Test
     [a0, a1, a2]
   end
 
-  def check_for_failure(word, suggestions_a, total_failures, word_error = nil)
+  def check_for_failure(word, suggestions_a, total_failures)
     suggestions_a.each_with_index.map do |a, i|
       total_failures[i] += 1 unless a.include? word
     end
@@ -109,7 +120,7 @@ class ExploreTest  < Minitest::Test
   end
 
   def print_results(first_times, total_suggestions, total_failures, n_repeat, title)
-    algorithms = ['Tree    ', 'Standard', 'Combined']
+    algorithms = ['Tree     ', 'Standard ', 'Augmented']
     print_header title
     (0..2).each do |i|
       ft = (first_times[i].to_f / n_repeat * 100).round(1)

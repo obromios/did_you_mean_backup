@@ -1,15 +1,14 @@
-EXPLORE = false # set to true to run tests
+TREE_SPELL_EXPLORE = false # set to true to run tests
   
-return unless EXPLORE
+return unless TREE_SPELL_EXPLORE
 
 require 'test_helper'
 require 'set'
 require 'yaml'
 require_relative 'human_typo'
 
-class ExploreTest  < Minitest::Test
-
-
+# statistical tests on tree_spell algorithms
+class ExploreTest < Minitest::Test
   def test_checkers_with_many_typos_on_mini
     n_repeat = 10_000
     yaml = File.open('test/tree_spell/mini_dir.yml', 'r', &:read)
@@ -39,23 +38,28 @@ class ExploreTest  < Minitest::Test
   end
 
   def test_execution_speed
-    n_repeat = 100
+    n_repeat = 1_000
+    puts ''
+    puts 'Testing execution time of Standard'
+    measure_execution_speed(n_repeat) do |files, error|
+      DidYouMean::SpellChecker.new(dictionary: files).correct error
+    end
     puts ''
     puts 'Testing execution time of Tree'
     measure_execution_speed(n_repeat) do |files, error|
       DidYouMean::TreeSpellChecker.new(dictionary: files).correct error
     end
     puts ''
-    puts 'Testing execution time of Standard'
+    puts 'Testing execution time of Augmented Tree'
     measure_execution_speed(n_repeat) do |files, error|
-      DidYouMean::SpellChecker.new(dictionary: files).correct error
+      DidYouMean::TreeSpellChecker.new(dictionary: files, augment: true).correct error
     end
   end
 
   private
 
   def measure_execution_speed(n_repeat, &block)
-    files = load_mini_dir
+    files = load_rspec_dir
     len = files.length
     start_time = Time.now
     n_repeat.times do
@@ -66,7 +70,6 @@ class ExploreTest  < Minitest::Test
     time_ms = (Time.now - start_time).to_f * 1000 / n_repeat
     puts "Average time (ms): #{time_ms.round(1)}"
   end
-
 
   def load_rspec_dir
     yaml = File.open('test/tree_spell/rspec_dir.yml', 'r', &:read)

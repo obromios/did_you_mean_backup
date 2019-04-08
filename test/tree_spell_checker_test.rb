@@ -72,7 +72,7 @@ class TreeSpellCheckerTest  < Minitest::Test
 
   def special_words_rspec
     [
-      ['spec/rspec/core/formatters/exception_presenter_spec.rb', 'spec/rspec/core/formatters/eception_presenter_spec.rb'],
+      ['spec/rspec/core/formatters/exception_presenter_spec.rb','spec/rspec/core/formatters/eception_presenter_spec.rb'],
       ['spec/rspec/core/ordering_spec.rb', 'spec/spec/core/odrering_spec.rb'],
       ['spec/rspec/core/metadata_spec.rb', 'spec/rspec/core/metadata_spe.crb'],
       ['spec/support/mathn_integration_support.rb', 'spec/support/mathn_itegrtion_support.rb']

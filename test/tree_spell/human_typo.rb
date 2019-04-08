@@ -1,3 +1,4 @@
+# module for classes needed to test TreeSpellChecker
 module TreeSpell
   require_relative 'change_word'
   # Simulate an error prone human typist

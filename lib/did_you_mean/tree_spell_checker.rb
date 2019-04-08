@@ -1,5 +1,6 @@
 module DidYouMean
-  # spell checker for a dictionary that has a tree structure, see doc/tree_spell_checker_api.md
+  # spell checker for a dictionary that has a tree
+  # structure, see doc/tree_spell_checker_api.md
   class TreeSpellChecker
     attr_reader :dictionary, :dimensions, :separator, :augment
 
@@ -73,6 +74,7 @@ module DidYouMean
     end
   end
 
+  # parses the elements in each dimension
   class ParseDimensions
     def initialize(dictionary, separator)
       @dictionary = dictionary
@@ -108,9 +110,9 @@ module DidYouMean
     end
 
     attr_reader :dictionary, :separator
-
   end
 
+  # identifies the elements close to element
   class CorrectElement
     def initialize
     end
